@@ -4,6 +4,8 @@ import matplotlib as plt
 import cv2
 from PIL import Image
 import Tkinter as tk, Tkconstants, tkFileDialog
+import time
+
 
 
 def openFile():
@@ -27,6 +29,9 @@ def openImage(file_path = None):
 def grab_from_webcam():
     # Start webcam capture
     cap = cv2.VideoCapture(0)
+
+    # Pause for webcam to adjust
+    time.sleep(1)
 
     # Grabs a frame from the capture
     retval, frame = cap.read()

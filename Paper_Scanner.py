@@ -12,7 +12,7 @@ import os
 DEBUG = False
 SHOW_OUTLINE = False
 
-def scan(num_attempts = 1):
+def scan(num_attempts = 1, DEBUG = False, SHOW_OUTLINE = False):
     # Expected width to height ratio of the scan (Width/Height)
     scan_aspect_ratio = 8.5 / 11
 
@@ -32,9 +32,10 @@ def scan(num_attempts = 1):
     for attempt in xrange(num_attempts):
 
         # Pull in frame from webcam
-        retval, frame = grab_from_file()
+        retval, frame = grab_from_webcam()
         if not retval:
             continue
+
 
 
         # load the image and compute the ratio of the old height
@@ -46,6 +47,10 @@ def scan(num_attempts = 1):
         orig = image.copy()
         image = cv2.resize(orig,(int(image.shape[1]/ratio),int(HEIGHT)))
         origResize = image.copy()
+
+        if SHOW_OUTLINE:
+            cv2.imshow("Original",origResize)
+            cv2.waitKey(0)
 
         # convert the image to grayscale, blur it, and find edges
         # in the image
@@ -94,14 +99,16 @@ def scan(num_attempts = 1):
         # view of the original image
         warped = four_point_transform(orig, screenCnt.reshape(4, 2) * ratio)
 
-
-         
          
         if DEBUG:
             # show the original and scanned images
             print "STEP 3: Apply perspective transform"
             cv2.imshow("Original", origResize)
             cv2.imshow("Scanned", warped)
+            cv2.waitKey(0)
+
+        if SHOW_OUTLINE:
+            cv2.imshow("Outline",image)
             cv2.waitKey(0)
 
         # By looking at the dimensions of the flattened image,
@@ -136,7 +143,6 @@ def scan(num_attempts = 1):
         return scan
 
 
-
 def save_scan(scan):
     # Save image
     save_dir = "\saved_scans\Scan.jpg"
@@ -148,6 +154,9 @@ def open_scan(path):
     # Open image in default program
     os.system("\""+ path + "\"")
 
+
+while 1:
+    scan(SHOW_OUTLINE = True)
 
 
 scan = scan()
