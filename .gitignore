@@ -1,6 +1,8 @@
 # Compliled python files
-.pyc
+*.pyc
 
+# Scanned Images
+*.jpg
 
 # Windows image file caches
 Thumbs.db
