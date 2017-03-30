@@ -9,8 +9,6 @@ import numpy as np
 import cv2
 import os
  
-DEBUG = False
-SHOW_OUTLINE = False
 
 def scan(num_attempts = 1, DEBUG = False, SHOW_OUTLINE = False):
     # Expected width to height ratio of the scan (Width/Height)
@@ -78,7 +76,7 @@ def scan(num_attempts = 1, DEBUG = False, SHOW_OUTLINE = False):
         for cnt in cnts:
             # approximate the contour
             peri = cv2.arcLength(cnt, True)
-            approx = cv2.approxPolyDP(cnt, 0.02 * peri, True)
+            approx = cv2.approxPolyDP(cnt, 0.01 * peri, True)
             cv2.drawContours(image, [approx], -1, (0, 255, 0), 2)
             # if our approximated contour has four points, then we
             # can assume that we have found our screen
@@ -126,7 +124,12 @@ def scan(num_attempts = 1, DEBUG = False, SHOW_OUTLINE = False):
         # Check to see if the capture is within some margin
         # of the expect aspect ratio.
         if abs(warped_ratio - scan_aspect_ratio) > epsilon:
-            continue
+            # This is intended to remove scans that are not
+            # roughly the ratio we are expecting. However, this
+            # is a little too arbitrary right now. If the camera
+            # is heavily angled, it will give a ratio outside of
+            # the given error.
+            pass
         # Check to see if the image is at least some size
         # relative to the full size of the frame
         elif abs(warped_height / float(image.shape[0])) < minSize:
@@ -145,7 +148,7 @@ def scan(num_attempts = 1, DEBUG = False, SHOW_OUTLINE = False):
 
 def save_scan(scan):
     # Save image
-    save_dir = "\saved_scans\Scan.jpg"
+    save_dir = "\saved_scans\Scanned.jpg"
     path = os.getcwd() + save_dir
     cv2.imwrite(path, scan)
     return path
@@ -155,10 +158,9 @@ def open_scan(path):
     os.system("\""+ path + "\"")
 
 
-while 1:
-    scan(SHOW_OUTLINE = True)
 
+scan = scan(num_attempts = 2, SHOW_OUTLINE = True, DEBUG = True)
 
-scan = scan()
-path = save_scan(scan)
-open_scan(path)
+if not scan is None:
+    path = save_scan(scan)
+    open_scan(path)
